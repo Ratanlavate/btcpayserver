@@ -162,14 +162,25 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-2 ms-auto quantities">
-                            <button type="button" v-on:click="updateQuantity(item.id, -1, true)" class="btn btn-minus"
+                            <button v-if="!item.optionGroups || !item.optionGroups.length" type="button" v-on:click="updateQuantity(item.id, -1, true)" class="btn btn-minus"
                                     :disabled="getQuantity(item.id) <= 0 || item.disabled">
                                 <span><vc:icon symbol="minus" css-class="ms-0" /></span>
                             </button>
                             <div class="quantity text-center fs-5" style="width:2rem">{{ getQuantity(item.id) }}</div>
-                            <button type="button" v-on:click="updateQuantity(item.id, +1, true)" class="btn btn-plus"
+                            <button type="button" v-on:click="addToCart(index, 1)" class="btn btn-plus"
                                     :disabled="!inStock(index) || item.disabled">
                                 <span><vc:icon symbol="plus" css-class="ms-0" /></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div v-if="item.optionGroups && item.optionGroups.length" class="d-flex flex-column gap-2 mt-2">
+                        <div v-for="line in cart.filter(line => line.id === item.id)" :key="line._key"
+                             class="posItem__variant d-flex align-items-center gap-2">
+                            <span class="flex-grow-1">{{ line.count }} × {{ (line.options || []).join(', ') }} ({{ formatCurrency(line.price, true) }})</span>
+                            <button type="button" class="posItem__variant-remove btn btn-minus"
+                                    v-on:click="updateQuantity(line, -1, true)" :disabled="item.disabled"
+                                    aria-label="@StringLocalizer["Remove one item"]">
+                                <vc:icon symbol="minus" css-class="ms-0" />
                             </button>
                         </div>
                     </div>
@@ -178,4 +189,5 @@
             </div>
         </div>
     </div>
+    <partial name="/Plugins/PointOfSale/Views/Public/_OptionsModal.cshtml" />
 </form>

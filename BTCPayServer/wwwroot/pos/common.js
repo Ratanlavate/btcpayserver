@@ -385,7 +385,7 @@ const posCommon = {
 
             // Items with option groups need the guest to pick options first
             if (Array.isArray(item.optionGroups) && item.optionGroups.length > 0) {
-                // The options modal is rendered in the Cart view; views without it (e.g. keypad) cannot pick options
+                // The cart and keypad views share the options picker
                 if (this.$refs?.OptionsModal) {
                     this.openOptions(index);
                     return null;
@@ -502,10 +502,9 @@ const posCommon = {
             this.posOrder.setCart(this.cart, this.amounts, this.defaultTaxRate, this.taxIncludedInPrice);
         },
         getQuantity(item) {
-            const itemInCart = typeof item === 'object'
-                ? this.cart.find(lineItem => lineItem === item)
-                : this.cart.find(lineItem => lineItem.id === item);
-            return itemInCart ? itemInCart.count : 0;
+            return this.cart
+                .filter(lineItem => typeof item === 'object' ? lineItem === item : lineItem.id === item)
+                .reduce((quantity, lineItem) => quantity + (+lineItem.count || 0), 0);
         },
         updateQuantity(item, count, addOrRemove) {
             let itemInCart = typeof item === 'object'
@@ -521,7 +520,7 @@ const posCommon = {
                     itemInCart = this.addToCart(index, 0);
                     if (!itemInCart) return;
                 } else if (optionBearing) {
-                    // No options modal available (e.g. keypad view): add directly with base behavior.
+                    // Views without a picker retain their base behavior.
                     itemInCart = this.addToCart(index, count);
                     added = true;
                 } else {
@@ -538,7 +537,7 @@ const posCommon = {
                 itemInCart.count += count;
             }
             if (itemInCart && itemInCart.count <= 0 && addOrRemove) {
-                this.removeFromCart(itemInCart.id);
+                this.removeFromCart(itemInCart);
             }
             this.posOrder.setCart(this.cart, this.amounts, this.defaultTaxRate, this.taxIncludedInPrice);
         },

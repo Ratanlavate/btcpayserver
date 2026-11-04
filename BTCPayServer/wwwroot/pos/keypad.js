@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded",function () {
                 if (!this.tipNumeric && !(this.discountNumeric > 0 || this.discountPercentNumeric > 0 || this.summary.tax > 0) && this.amounts.length < 2 && this.cart.length === 0) return null
                 let calc = ''
                 const hasAmounts = this.amounts.length && this.amounts.reduce((sum, amt) => sum + parseFloat(amt || 0), 0) > 0;
-                if (this.cart.length) calc += this.cart.map(item => `${item.count} x ${item.title} (${this.formatCurrency(item.price, true)}) = ${this.formatCurrency((item.price||0) * item.count, true)}`).join(' + ')
+                if (this.cart.length) calc += this.cart.map(item => `${item.count} x ${item.title}${item.options?.length ? ` [${item.options.join(', ')}]` : ''} (${this.formatCurrency(item.price, true)}) = ${this.formatCurrency((item.price||0) * item.count, true)}`).join(' + ')
                 if (this.cart.length && hasAmounts) calc += ' + '
                 if (hasAmounts) calc += this.amounts.map(amt => this.formatCurrency(amt || 0, true)).join(' + ')
                 if (this.discountNumeric > 0 || this.discountPercentNumeric > 0) calc += ` - ${this.formatCurrency(this.discountNumeric, true)} (${this.discountPercent}%)`
